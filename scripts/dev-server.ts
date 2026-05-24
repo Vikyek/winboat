@@ -43,7 +43,12 @@ async function startElectron() {
         return;
     }
 
-    const args = [Path.join(__dirname, "..", "build", "main", "main.js"), String(rendererPort)];
+    const extraArgs = process.argv.slice(2);
+    const args = [
+        Path.join(__dirname, "..", "build", "main", "main.js"),
+        String(rendererPort),
+        ...extraArgs
+    ];
 
     electronProcess = ChildProcess.spawn(String(Electron), args);
     electronProcessLocker = false;
