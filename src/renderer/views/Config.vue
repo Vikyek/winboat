@@ -69,6 +69,15 @@
                     v-model:value="autoStartContainer"
                 />
 
+                <!-- GPU Acceleration -->
+                <ConfigCard
+                    icon="mdi:gpu"
+                    title="GPU Acceleration"
+                    desc="If enabled, passes through host GPU devices (/dev/dri) to the Windows container for hardware acceleration (Intel/AMD)"
+                    type="switch"
+                    v-model:value="gpuAcceleration"
+                />
+
                 <!-- FreeRDP Port -->
                 <ConfigCard
                     icon="lucide:ethernet-port"
@@ -145,21 +154,10 @@
                                 </x-button>
                             </x-card>
                         </template>
-                        <template v-if="wbConfig.config.containerRuntime === ContainerRuntimes.PODMAN">
-                            <x-card
-                                class="flex items-center py-2 w-full my-2 backdrop-blur-xl gap-4 backdrop-brightness-150 bg-yellow-200/10"
-                            >
-                                <Icon class="inline-flex text-yellow-500 size-8" icon="clarity:warning-solid"></Icon>
-                                <h1 class="my-0 text-base font-normal text-yellow-200">
-                                    USB Passthrough is not yet supported while using Podman as the container runtime.
-                                </h1>
-                            </x-card>
-                        </template>
                         <template
                             v-if="
                                 !usbPassthroughDisabled &&
-                                !isUpdatingUSBPrerequisites &&
-                                wbConfig.config.containerRuntime === ContainerRuntimes.DOCKER
+                                !isUpdatingUSBPrerequisites
                             "
                         >
                             <x-label
@@ -494,6 +492,8 @@ const origAutoStartContainer = ref(false);
 const autoStartContainer = ref(false);
 const freerdpPort = ref(0);
 const origFreerdpPort = ref(0);
+const gpuAcceleration = ref(false);
+const origGpuAcceleration = ref(false);
 const isApplyingChanges = ref(false);
 const resetQuestionCounter = ref(0);
 const isResettingWinboat = ref(false);
@@ -551,6 +551,9 @@ async function assignValues() {
     autoStartContainer.value = compose.value.services.windows.restart === RESTART_ON_FAILURE;
     origAutoStartContainer.value = autoStartContainer.value;
 
+    gpuAcceleration.value = compose.value.services.windows.environment.GPU === "Y";
+    origGpuAcceleration.value = gpuAcceleration.value;
+
     freerdpPort.value = (portMapper.value.getShortPortMapping(GUEST_RDP_PORT)?.host as number) ?? GUEST_RDP_PORT;
     origFreerdpPort.value = freerdpPort.value;
 
@@ -581,6 +584,23 @@ async function saveCompose() {
     if (shareFolder.value && sharedFolderPath.value) {
         const volumeStr = `${sharedFolderPath.value}:/shared`;
         compose.value!.services.windows.volumes.push(volumeStr);
+    }
+
+    if (gpuAcceleration.value) {
+        compose.value!.services.windows.environment.GPU = "Y";
+        if (!compose.value!.services.windows.devices) {
+            compose.value!.services.windows.devices = [];
+        }
+        if (!compose.value!.services.windows.devices.includes("/dev/dri") && !compose.value!.services.windows.devices.includes("/dev/dri:/dev/dri")) {
+            compose.value!.services.windows.devices.push("/dev/dri:/dev/dri");
+        }
+    } else {
+        delete compose.value!.services.windows.environment.GPU;
+        if (compose.value!.services.windows.devices) {
+            compose.value!.services.windows.devices = compose.value!.services.windows.devices.filter(
+                d => d !== "/dev/dri" && d !== "/dev/dri:/dev/dri"
+            );
+        }
     }
 
     compose.value!.services.windows.restart = autoStartContainer.value ? RESTART_ON_FAILURE : RESTART_NO;
@@ -725,7 +745,8 @@ const saveButtonDisabled = computed(() => {
         shareFolder.value !== origShareFolder.value ||
         sharedFolderPath.value !== origSharedFolderPath.value ||
         (!Number.isNaN(freerdpPort.value) && freerdpPort.value !== origFreerdpPort.value) ||
-        autoStartContainer.value !== origAutoStartContainer.value;
+        autoStartContainer.value !== origAutoStartContainer.value ||
+        gpuAcceleration.value !== origGpuAcceleration.value;
 
     const shouldBeDisabled = errors.value?.length || !hasResourceChanges || isApplyingChanges.value;
 
