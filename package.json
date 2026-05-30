@@ -20,6 +20,7 @@
         "email": "staff@winboat.app"
     },
     "devDependencies": {
+    "vite-plugin-node-polyfills": "^0.23.0",
         "@types/node-fetch": "^2.6.13",
         "@types/turndown": "^5.0.6",
         "@vitejs/plugin-vue": "^6.0.4",

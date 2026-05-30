@@ -432,7 +432,7 @@ function readLinuxDeviceDatabase(): LinuxDeviceDatabase {
     // Fallback to static file if the distro doesn't ship with usb.ids
     if (!fs.existsSync(dbFilePath)) {
         dbFilePath = remote.app.isPackaged
-            ? path.join(process.resourcesPath, "data", "usb.ids") // For packaged app
+            ? path.join(remote.process.resourcesPath, "data", "usb.ids") // For packaged app
             : path.join(remote.app.getAppPath(), "..", "..", "data", "usb.ids"); // For dev mode
     }
 

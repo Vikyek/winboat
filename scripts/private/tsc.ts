@@ -1,9 +1,10 @@
 import ChildProcess from "child_process";
+import Path from "path";
 import Chalk from "chalk";
 
 export default function compile(directory) {
     return new Promise<void>((resolve, reject) => {
-        const tscProcess = ChildProcess.exec("tsc", {
+        const tscProcess = ChildProcess.exec(Path.join(process.cwd(), "node_modules", ".bin", "tsc"), {
             cwd: directory,
         });
 

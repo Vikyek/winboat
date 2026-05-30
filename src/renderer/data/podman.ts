@@ -10,6 +10,7 @@ export const PODMAN_DEFAULT_COMPOSE: ComposeConfig = {
         windows: {
             image: "ghcr.io/dockur/windows:5.15",
             container_name: "WinBoat",
+            network_mode: "pasta",
             environment: {
                 VERSION: "11",
                 RAM_SIZE: "4G",
@@ -22,7 +23,7 @@ export const PODMAN_DEFAULT_COMPOSE: ComposeConfig = {
                 NETWORK: "slirp",
                 USER_PORTS: "7148",
                 HOST_PORTS: "7149",
-                ARGUMENTS: "-qmp tcp:0.0.0.0:7149,server,wait=off",
+                ARGUMENTS: "-qmp tcp:0.0.0.0:7149,server,wait=off -rtc base=localtime,clock=host -no-hpet",
             },
             cap_add: ["NET_ADMIN"],
             ports: [

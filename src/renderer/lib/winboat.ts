@@ -71,12 +71,20 @@ const presetApps: WinApp[] = [
  * The stock RDP args that apply to all app launches by default
  */
 const stockArgs = [
+    "/dynamic-resolution",
+    "/smart-sizing",
     "/cert:ignore",
     "+clipboard",
     "/sound:sys:pulse",
     "/microphone:sys:pulse",
     "/floatbar",
-    "/compression",
+    "/network:lan",
+    "/compression-level:0",
+    "/gfx:rfx",
+    "/gdi:hw",
+    "+glyph-cache",
+    "+bitmap-cache",
+    "+offscreen-cache",
     "/sec:tls",
 ];
 
@@ -652,7 +660,7 @@ export class Winboat {
 
         if (app.Path == InternalApps.WINDOWS_DESKTOP) {
             args = args.concat([
-                "+f",
+                
                 this.#wbConfig?.config.smartcardEnabled ? "/smartcard" : "",
                 `/scale:${this.#wbConfig?.config.scale ?? 100}`,
             ]);
@@ -724,7 +732,7 @@ export class Winboat {
         // 3. Set update flag & grab winboat_guest_server.zip from Electron assets
         this.isUpdatingGuestServer.value = true;
         const zipPath = remote.app.isPackaged
-            ? path.join(process.resourcesPath, "guest_server", "winboat_guest_server.zip")
+            ? path.join(remote.process.resourcesPath, "guest_server", "winboat_guest_server.zip")
             : path.join(remote.app.getAppPath(), "..", "..", "guest_server", "winboat_guest_server.zip");
 
         logger.info("ZIP Path", zipPath);

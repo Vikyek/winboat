@@ -21,7 +21,7 @@ export const DOCKER_DEFAULT_COMPOSE: ComposeConfig = {
                 LANGUAGE: "English",
                 USER_PORTS: "7148",
                 HOST_PORTS: "7149",
-                ARGUMENTS: "-qmp tcp:0.0.0.0:7149,server,wait=off",
+                ARGUMENTS: "-qmp tcp:0.0.0.0:7149,server,wait=off -rtc base=localtime,clock=host -no-hpet",
             },
             cap_add: ["NET_ADMIN"],
             privileged: true,

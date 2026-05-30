@@ -145,7 +145,7 @@ export class InstallManager {
 
         // Determine the source path based on whether the app is bundled
         const appPath = remote.app.isPackaged
-            ? path.join(process.resourcesPath, "guest_server") // For packaged app
+            ? path.join(remote.process.resourcesPath, "guest_server") // For packaged app
             : path.join(remote.app.getAppPath(), "..", "..", "guest_server"); // For dev mode
 
         logger.info(`Guest server source path: ${appPath}`);

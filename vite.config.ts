@@ -1,5 +1,6 @@
 import path from "path";
 import vuePlugin from "@vitejs/plugin-vue";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defineConfig } from "vite";
 import * as packageJson from "./package.json";
 
@@ -18,7 +19,7 @@ const config = defineConfig({
         emptyOutDir: true,
         chunkSizeWarningLimit: NaN, // Not needed for a desktop app
     },
-    plugins: [
+    plugins: [ nodePolyfills({ globals: { process: true, buffer: true } }),
         vuePlugin({
             template: {
                 compilerOptions: {
@@ -29,7 +30,7 @@ const config = defineConfig({
     ],
     resolve: {
         alias: {
-            path: "path-browserify",
+            path: "path-browserify", "jimp": path.join(__dirname, "node_modules", "jimp", "dist", "esm", "index.js"),
         },
     },
 });

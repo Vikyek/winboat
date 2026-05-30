@@ -6,8 +6,8 @@ import Store from "electron-store";
 initialize();
 
 // Window Constants
-const WINDOW_MIN_WIDTH = 1280;
-const WINDOW_MIN_HEIGHT = 800;
+const WINDOW_MIN_WIDTH = 400;
+const WINDOW_MIN_HEIGHT = 300;
 
 // For electron-store Type-Safety
 type SchemaType = {
