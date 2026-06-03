@@ -439,6 +439,14 @@ export class Winboat {
     static readCompose(composePath: string): ComposeConfig {
         const composeFile = fs.readFileSync(composePath, "utf-8");
         const composeContents = YAML.parse(composeFile) as ComposeConfig;
+        if (composeContents?.services?.windows) {
+            const restart = composeContents.services.windows.restart;
+            if (typeof restart === "boolean") {
+                composeContents.services.windows.restart = restart ? "on-failure" : "no";
+            } else if (restart === "false") {
+                composeContents.services.windows.restart = "no";
+            }
+        }
         return composeContents;
     }
 
